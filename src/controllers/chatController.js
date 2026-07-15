@@ -1,0 +1,17 @@
+import { getGeminiChatResponse } from "../services/geminiServices.js";
+
+export const handleChatResponse = async (req, res) => {
+    try {
+        const { userMessage } = req.body;
+
+        if (!userMessage) {
+            return res.statuse(400).json({ error: "Message content cannot be blank."});
+        }
+
+        const reply = await getGeminiChatResponse(userMessage);
+        return res.status(200).json({ reply });
+    } catch (error) {
+        console.error("Chat controller Error:", error);
+        return res.status(500).json({ error: "Internal server error connecting to Google AI service."});
+    }
+};
