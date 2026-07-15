@@ -10,8 +10,9 @@ app.use(cors({
         'http://localhost:5173',
         'https://my-portfolio-frontend-kkcwiodo1-domn8r.vercel.app'
     ],
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
+    allowedHeaders: ['Content-Type'],
 }));
 app.use(express.json());
 
