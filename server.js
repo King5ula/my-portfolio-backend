@@ -8,13 +8,18 @@ const app = express();
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'my-portfolio-frontend-kg5dpdn5v-domn8r.vercel.app'
+        'https://my-portfolio-frontend-kg5dpdn5v-domn8r.vercel.app',
+        'https://my-portfolio-frontend-domn8r.vercel.app'
     ],
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type'],
+    optionsSuccessStatus: 200
 }));
 app.use(express.json());
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Seamless mounting engine
 app.use('/api', chatRouter);
