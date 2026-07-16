@@ -8,23 +8,35 @@ const client = new GoogleGenAI({
 
 export const getGeminiChatResponse = async (userMessage) => {
     try {
-        const fullPrompt = `${DAVID_PROMPT}\n\nUser: ${userMessage}`;
+        console.log('Starting Gemini API call with message:', userMessage.substring(0, 50));
+        console.log('API Key exists:', !!config.geminiApiKey);
         
         const response = await client.models.generateContent({
-            model: 'models/gemini-1.5-flash',
+            model: 'gemini-1.5-flash',
             contents: [{
                 role: 'user',
-                parts: [{ text: fullPrompt }]
+                parts: [{
+                    text: `${DAVID_PROMPT}\n\nUser: ${userMessage}`
+                }]
             }]
         });
         
-        if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts && response.candidates[0].content.parts[0]) {
-            return response.candidates[0].content.parts[0].text;
+        console.log('Response received:', response);
+        
+        // Try different ways to get the text
+        if (response.text && typeof response.text === 'function') {
+            return response.text();
+        } else if (response.text && typeof response.text === 'string') {
+            return response.text;
+        } else if (response.candidates && response.candidates[0]) {
+            const part = response.candidates[0].content?.parts?.[0];
+            if (part?.text) return part.text;
         }
         
-        throw new Error('Invalid response structure from Gemini');
+        console.error('Could not extract text from response:', JSON.stringify(response));
+        throw new Error('Could not extract text from Gemini response');
     } catch (error) {
-        console.error('Gemini API Error:', error.message || error);
-        throw new Error(`Gemini API failed: ${error.message}`);
+        console.error('Full Gemini error:', error);
+        throw error;
     }
 };  
