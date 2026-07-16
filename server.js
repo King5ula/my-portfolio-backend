@@ -18,9 +18,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Handle preflight requests
-app.options('*', cors());
-
 // Seamless mounting engine
 app.use('/api', chatRouter);
 
