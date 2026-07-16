@@ -12,7 +12,7 @@ export const getGeminiChatResponse = async (userMessage) => {
         console.log('API Key exists:', !!config.geminiApiKey);
         
         const response = await client.models.generateContent({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-pro',
             contents: [{
                 role: 'user',
                 parts: [{
