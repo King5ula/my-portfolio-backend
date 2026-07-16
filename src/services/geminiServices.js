@@ -2,28 +2,29 @@ import { GoogleGenAI } from '@google/genai';
 import { config } from './../config/env.js';
 import { DAVID_PROMPT } from '../prompts/davidPrompt.js';
 
-const ai = new GoogleGenAI({ apiKey: config.geminiApiKey })
+const client = new GoogleGenAI({
+    apiKey: config.geminiApiKey
+});
 
 export const getGeminiChatResponse = async (userMessage) => {
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
+        const fullPrompt = `${DAVID_PROMPT}\n\nUser: ${userMessage}`;
+        
+        const response = await client.models.generateContent({
+            model: 'models/gemini-1.5-flash',
             contents: [{
                 role: 'user',
-                parts: [{text: `${DAVID_PROMPT}\n\nUser: ${userMessage}`}]
-            }],
-            generationConfig: {
-                temperature: 0.4,
-                maxOutputTokens: 1024
-            }
+                parts: [{ text: fullPrompt }]
+            }]
         });
         
-        if (response && response.text) {
-            return response.text();
+        if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts && response.candidates[0].content.parts[0]) {
+            return response.candidates[0].content.parts[0].text;
         }
-        throw new Error('No text in response');
+        
+        throw new Error('Invalid response structure from Gemini');
     } catch (error) {
-        console.error('Gemini API Error:', error);
-        throw error;
+        console.error('Gemini API Error:', error.message || error);
+        throw new Error(`Gemini API failed: ${error.message}`);
     }
 };  
