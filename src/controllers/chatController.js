@@ -5,7 +5,7 @@ export const handleChatResponse = async (req, res) => {
         const { userMessage } = req.body;
 
         if (!userMessage) {
-            return res.statuse(400).json({ error: "Message content cannot be blank."});
+            return res.status(400).json({ error: "Message content cannot be blank."});
         }
 
         const reply = await getGeminiChatResponse(userMessage);

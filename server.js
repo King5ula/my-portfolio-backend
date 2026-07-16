@@ -8,7 +8,7 @@ const app = express();
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://my-portfolio-frontend-kkcwiodo1-domn8r.vercel.app'
+        'https://my-portfolio-frontend-domn8r.vercel.app'
     ],
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
