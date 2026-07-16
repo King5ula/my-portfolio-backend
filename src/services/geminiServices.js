@@ -6,7 +6,7 @@ const ai = new GoogleGenAI({ apiKey: config.geminiApiKey })
 
 export const getGeminiChatResponse = async (userMessage) => {
     const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-1.5-flash',
         contents: [{
             role: 'user',
             parts: [{text: userMessage}]
