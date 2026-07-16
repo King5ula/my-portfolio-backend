@@ -1,6 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
 import { config } from './../config/env.js';
-import { DAVID_PROMPT } from '../prompts/davidPrompt.js';
 
 const client = new GoogleGenAI({
     apiKey: config.geminiApiKey
@@ -8,35 +7,43 @@ const client = new GoogleGenAI({
 
 export const getGeminiChatResponse = async (userMessage) => {
     try {
-        console.log('Starting Gemini API call with message:', userMessage.substring(0, 50));
-        console.log('API Key exists:', !!config.geminiApiKey);
+        console.log('Calling Gemini with message:', userMessage.substring(0, 50));
         
+        // Simple test call first
         const response = await client.models.generateContent({
             model: 'gemini-pro',
             contents: [{
                 role: 'user',
                 parts: [{
-                    text: `${DAVID_PROMPT}\n\nUser: ${userMessage}`
+                    text: userMessage
                 }]
             }]
         });
         
-        console.log('Response received:', response);
+        console.log('Raw response:', response);
         
-        // Try different ways to get the text
-        if (response.text && typeof response.text === 'function') {
-            return response.text();
-        } else if (response.text && typeof response.text === 'string') {
-            return response.text;
-        } else if (response.candidates && response.candidates[0]) {
-            const part = response.candidates[0].content?.parts?.[0];
-            if (part?.text) return part.text;
+        // Extract text from response
+        let text;
+        if (typeof response.text === 'function') {
+            text = response.text();
+        } else if (response.text) {
+            text = response.text;
+        } else if (response.candidates?.[0]?.content?.parts?.[0]?.text) {
+            text = response.candidates[0].content.parts[0].text;
         }
         
-        console.error('Could not extract text from response:', JSON.stringify(response));
-        throw new Error('Could not extract text from Gemini response');
+        if (!text) {
+            throw new Error('No text in response: ' + JSON.stringify(response));
+        }
+        
+        return text;
     } catch (error) {
-        console.error('Full Gemini error:', error);
+        console.error('Gemini error details:', {
+            message: error.message,
+            status: error.status,
+            statusText: error.statusText,
+            stack: error.stack
+        });
         throw error;
     }
 };  
