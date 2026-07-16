@@ -6,12 +6,15 @@ const ai = new GoogleGenAI({ apiKey: config.geminiApiKey })
 
 export const getGeminiChatResponse = async (userMessage) => {
     const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: userMessage,
-        config: {
-            systemInstruction: DAVID_PROMPT,
+        model: 'gemini-2.0-flash',
+        contents: [{
+            role: 'user',
+            parts: [{text: userMessage}]
+        }],
+        systemInstruction: DAVID_PROMPT,
+        generationConfig: {
             temperature: 0.4
         }
     });
-    return response.text;
+    return response.text();
 };  
