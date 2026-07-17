@@ -5,13 +5,15 @@ import { chatRouter } from './src/routes/chatRoutes.js'; // Clean named object b
 
 const app = express();
 
+const allowedOriginPattern = /^http:\/\/localhost:5173$|^https:\/\/my-portfolio-frontend(-[a-z0-9]+)*\.vercel\.app$/;
+
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'https://my-portfolio-frontend-rd8rfk620-domn8r.vercel.app',
-        'https://my-portfolio-frontend-kg5dpdn5v-domn8r.vercel.app',
-        'https://my-portfolio-frontend-domn8r.vercel.app'
-    ],
+    origin: (origin, callback) => {
+        if (!origin || allowedOriginPattern.test(origin)) {
+            return callback(null, true);
+        }
+        callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type'],
