@@ -19,8 +19,8 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     # Fail at startup, not on the first visitor's message, if the LLM isn't configured.
     get_chat_backend()
-    if not settings.email_user or not settings.email_pass:
-        logger.warning("Email credentials are blank. The contact form will fail.")
+    if not settings.resend_api_key and not (settings.email_user and settings.email_pass):
+        logger.warning("No email provider is configured. The contact form will fail.")
     yield
 
 
@@ -60,4 +60,8 @@ app.include_router(contact.router, prefix="/api")
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "llm_backend": settings.llm_backend}
+    return {
+        "status": "ok",
+        "llm_backend": settings.llm_backend,
+        "email_backend": "resend" if settings.resend_api_key else "smtp",
+    }

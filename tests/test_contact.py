@@ -1,7 +1,19 @@
+import json
+
+import httpx
+import pytest
+
 from app.config import Settings
 from app.main import app
 from app.schemas.contact import ContactRequest
-from app.services.email import build_contact_message, get_email_sender
+from app.services.email import (
+    EmailSendError,
+    ResendEmailSender,
+    SmtpEmailSender,
+    build_contact_message,
+    build_email_sender,
+    get_email_sender,
+)
 
 VALID = {"name": "Ada", "email": "ada@example.com", "message": "Hello David"}
 
@@ -73,3 +85,42 @@ def test_contact_email_escapes_visitor_html():
     assert "<script>alert(1)</script>" in text
     assert message["Reply-To"] == "ada@example.com"
     assert message["To"] == "me@example.com"
+
+
+def _resend_settings() -> Settings:
+    return Settings(_env_file=None, resend_api_key="re_test", email_receiver="me@example.com")
+
+
+async def test_resend_sender_posts_the_message():
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(200, json={"id": "abc"})
+
+    sender = ResendEmailSender(_resend_settings(), transport=httpx.MockTransport(handler))
+    await sender.send_contact_email(ContactRequest(**{**VALID, "message": "<b>Hi</b>"}))
+
+    assert str(seen[0].url) == "https://api.resend.com/emails"
+    assert seen[0].headers["Authorization"] == "Bearer re_test"
+    body = json.loads(seen[0].content)
+    assert body["to"] == ["me@example.com"]
+    assert body["reply_to"] == "ada@example.com"
+    assert "Ada" in body["subject"]
+    assert "&lt;b&gt;Hi&lt;/b&gt;" in body["html"]
+    assert "<b>Hi</b>" in body["text"]
+
+
+async def test_resend_sender_raises_when_the_api_rejects():
+    sender = ResendEmailSender(
+        _resend_settings(),
+        transport=httpx.MockTransport(lambda request: httpx.Response(403, json={"message": "no"})),
+    )
+
+    with pytest.raises(EmailSendError, match="403"):
+        await sender.send_contact_email(ContactRequest(**VALID))
+
+
+def test_email_sender_is_resend_only_when_a_key_is_set():
+    assert isinstance(build_email_sender(_resend_settings()), ResendEmailSender)
+    assert isinstance(build_email_sender(Settings(_env_file=None)), SmtpEmailSender)

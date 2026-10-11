@@ -1,3 +1,4 @@
+from app.api.chat import to_plain_text
 from app.main import app
 from app.services.chat_backend import ChatBackendError, get_chat_backend
 
@@ -61,3 +62,25 @@ def test_health(client):
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+
+
+def test_reply_markdown_is_converted_to_plain_text():
+    assert to_plain_text("I built a **custom system** with `React`.") == (
+        "I built a custom system with React."
+    )
+    assert to_plain_text("## Projects\n- Tina chatbot\n* Z Energy") == (
+        "Projects\nTina chatbot\nZ Energy"
+    )
+    assert to_plain_text("2 * 3 = 6, and snake_case stays") == "2 * 3 = 6, and snake_case stays"
+
+
+def test_chat_reply_is_returned_as_plain_text(client):
+    class MarkdownBackend:
+        async def reply(self, user_message: str) -> str:
+            return "**Hello** there"
+
+    app.dependency_overrides[get_chat_backend] = lambda: MarkdownBackend()
+
+    response = client.post("/api/chat", json={"userMessage": "hi"})
+
+    assert response.json() == {"reply": "Hello there"}

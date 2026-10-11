@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     email_user: str = ""
     email_pass: str = ""
     email_receiver: str = ""
+    # When set, contact email goes through Resend's HTTPS API instead of SMTP.
+    # Needed on hosts that block outbound SMTP ports (Render's free tier does).
+    resend_api_key: str = ""
+    resend_from: str = "Portfolio Contact <onboarding@resend.dev>"
 
     # Comma-separated exact origins, plus one regex for Vercel preview URLs.
     cors_allowed_origins: str = "http://localhost:3000"

@@ -57,6 +57,10 @@ Everything is an env var; see `.env.example`.
 With `LLM_BACKEND=openrouter` the app refuses to start without
 `OPENROUTER_API_KEY`.
 
+Contact email is sent over SMTP by default. If `RESEND_API_KEY` is set it goes
+through [Resend](https://resend.com)'s HTTPS API instead, which is what the
+Render deployment uses because Render's free tier blocks outbound SMTP ports.
+
 ## Deploying (Render)
 
 - Runtime: Python 3

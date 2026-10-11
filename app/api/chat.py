@@ -1,4 +1,5 @@
 import logging
+import re
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -9,6 +10,14 @@ from app.services.chat_backend import ChatBackend, ChatBackendError, get_chat_ba
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+_EMPHASIS = re.compile(r"(\*\*|__|\*|`)(\S(?:.*?\S)?)\1", re.DOTALL)
+_LINE_PREFIX = re.compile(r"^\s{0,3}(#{1,6}\s+|[-*]\s+)", re.MULTILINE)
+
+
+def to_plain_text(reply: str) -> str:
+    """The chat widget shows text as-is, so markdown markers would appear literally."""
+    return _EMPHASIS.sub(r"\2", _LINE_PREFIX.sub("", reply)).strip()
 
 
 @router.post("/chat", response_model=ChatResponse, dependencies=[Depends(chat_limiter)])
@@ -24,4 +33,4 @@ async def chat(
             status_code=502,
             detail="David's AI clone is unavailable right now. Please try again shortly.",
         )
-    return ChatResponse(reply=reply)
+    return ChatResponse(reply=to_plain_text(reply))
