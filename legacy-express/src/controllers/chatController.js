@@ -1,4 +1,4 @@
-import { getGeminiChatResponse } from "../services/geminiServices.js";
+import { getChatResponse } from "../services/openRouterService.js";
 
 export const handleChatResponse = async (req, res) => {
     try {
@@ -8,7 +8,7 @@ export const handleChatResponse = async (req, res) => {
             return res.status(400).json({ error: "Message content cannot be blank."});
         }
 
-        const reply = await getGeminiChatResponse(userMessage);
+        const reply = await getChatResponse(userMessage);
         return res.status(200).json({ reply });
     } catch (error) {
         console.error("Chat controller Error:", error.message);
