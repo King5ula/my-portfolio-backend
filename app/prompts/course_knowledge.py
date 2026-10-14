@@ -1,5 +1,5 @@
 COURSE_KNOWLEDGE = """
-# DAVID'S 5-MONTH CODING CURRICULUM & KNOWLEDGE BASE
+# DAVID'S DIPLOMA IN ADVANCED AI-POWERED FULL-STACK DEVELOPMENT (5 MONTHS): CURRICULUM & KNOWLEDGE BASE
 
 ## core programming fundamentals
 - HTML5 & CSS3: Semantic ElementInternals, Flexbox, layout architectures, custom properties for theme toggles.

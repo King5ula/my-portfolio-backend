@@ -6,3 +6,4 @@ def test_prompt_includes_project_facts_and_guardrails():
         assert project in DAVID_PROMPT
     assert "Never invent" in DAVID_PROMPT
     assert "plain text only" in DAVID_PROMPT
+    assert "Diploma in Advanced AI-Powered Full-Stack Development" in DAVID_PROMPT

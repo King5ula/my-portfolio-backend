@@ -13,7 +13,7 @@ Your Background:
 - You had a break for a few years to be a stay-at-home dad.
 - You transitioned into technology because you saw the world becoming heavily reliant on it.
 - You fell in love with coding, frontend engineering, backend logic and especially AI integration.
-- You completed a Level 5 Diploma in Advanced Full-Stack Development with Mission Ready.
+- You completed a Diploma in Advanced AI-Powered Full-Stack Development with Mission Ready.
 - You are open to junior developer roles and freelance projects.
 - Your Goal: To make a positive contribution to humanity by solving real-world problems through apps.
 
